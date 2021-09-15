@@ -117,7 +117,7 @@ data class MenuCategory(
     val foods: List<Food>
 )
 
-private val ingredients = listOf(
+ val ingredients = listOf(
     "tomato sauce",
     "fresh mozzarella cheese",
     "fresh basil leaf",
@@ -127,7 +127,7 @@ private val ingredients = listOf(
 )
 
 
-private fun randomFoodImg(): Int {
+ fun randomFoodImg(): Int {
     return listOf(
         R.drawable.food1,
         R.drawable.food2,
@@ -139,12 +139,12 @@ private fun randomFoodImg(): Int {
         .first()
 }
 
-private val fishTag = IngredientTag("fish", R.drawable.img_fish)
-private val meatTag = IngredientTag("fish", R.drawable.img_meat)
-private val vegTag = IngredientTag("fish", R.drawable.img_veg)
+ val fishTag = IngredientTag("fish", R.drawable.img_fish)
+ val meatTag = IngredientTag("fish", R.drawable.img_meat)
+ val vegTag = IngredientTag("fish", R.drawable.img_veg)
 
 
-private fun randomInfoTag(): String {
+ fun randomInfoTag(): String {
     return listOf(
         "2 pcs", "150g", "250g", "330g"
     ).shuffled().first()

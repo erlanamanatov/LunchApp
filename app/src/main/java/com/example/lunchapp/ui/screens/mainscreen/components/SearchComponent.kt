@@ -1,5 +1,6 @@
 package com.example.lunchapp.ui.screens.mainscreen.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -17,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.lunchapp.ui.theme.LunchAppTheme
 
+@ExperimentalMaterialApi
 @Composable
 fun SearchComponent(
     modifier: Modifier = Modifier,
@@ -48,6 +50,7 @@ private fun searchFieldColors() = TextFieldDefaults.textFieldColors(
     unfocusedIndicatorColor = Color.Transparent
 )
 
+@ExperimentalMaterialApi
 @Composable
 private fun SearchBar(
     modifier: Modifier = Modifier,
@@ -76,10 +79,11 @@ private fun SearchBar(
         }
         Spacer(Modifier.width(8.dp))
         Card(
-            Modifier
+            modifier = Modifier
                 .fillMaxHeight()
                 .aspectRatio(1f),
-            elevation = 12.dp
+            elevation = 12.dp,
+            onClick = {}
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -146,6 +150,7 @@ private fun FilterItem(
     }
 }
 
+@ExperimentalMaterialApi
 @Preview(showBackground = true)
 @Composable
 fun SearchPreview() {

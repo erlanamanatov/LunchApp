@@ -25,6 +25,11 @@ private val LightColorPalette = lightColors(
     onSurface = Color.Black,
 )
 
+object AppColors {
+    val background = Color(0xFFf5f5f5)
+
+}
+
 @Composable
 fun LunchAppTheme(content: @Composable() () -> Unit) {
     val colors = LightColorPalette
