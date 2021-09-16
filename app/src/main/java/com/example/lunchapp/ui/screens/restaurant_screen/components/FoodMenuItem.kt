@@ -93,7 +93,7 @@ fun FoodTags(
     food: Food
 ) {
     Row(
-        modifier = Modifier.padding(top = 8.dp),
+        modifier = modifier.padding(top = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(

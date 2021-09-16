@@ -127,7 +127,7 @@ fun Film(modifier: Modifier, onCloseClick: () -> Unit) {
         alpha.animateTo(
             targetValue = 0.9f,
             animationSpec = tween(
-                durationMillis = 400
+                durationMillis = 200
             )
         )
     }
