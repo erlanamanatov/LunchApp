@@ -8,6 +8,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import com.example.lunchapp.ui.screens.mainscreen.MainScreen
+import com.example.lunchapp.ui.screens.restaurant_screen.RestaurantScreen
 import com.example.lunchapp.ui.theme.AppColors
 import com.example.lunchapp.ui.theme.LunchAppTheme
 
@@ -17,7 +18,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             LunchAppTheme {
-                MainScreen(Modifier.fillMaxSize())
+//                MainScreen(Modifier.fillMaxSize())
+                RestaurantScreen()
             }
         }
     }
