@@ -39,10 +39,18 @@ fun BestDeals(
             fontWeight = FontWeight.Bold
         )
         Row(Modifier.horizontalScroll(rememberScrollState())) {
-            for (food in foods) {
-                BestDealItem(food = food)
+            foods.forEachIndexed { index, food ->
+                BestDealItem(
+                    modifier = Modifier.offset(x = 24.dp),
+                    food = food
+                )
                 Spacer(Modifier.width(16.dp))
             }
+            Spacer(Modifier.width(32.dp))
+//            for (food in foods) {
+//                BestDealItem(food = food)
+//                Spacer(Modifier.width(16.dp))
+//            }
         }
     }
 }
@@ -83,7 +91,6 @@ private fun BestDealItem(
                 .height(135.dp)
                 .align(Alignment.BottomCenter),
             shape = RoundedCornerShape(corner),
-            onClick = {},
             backgroundColor = MaterialTheme.colors.surface,
             elevation = 4.dp
         ) {
@@ -109,7 +116,9 @@ private fun BestDealItem(
                             Text(
                                 text = restName,
                                 fontSize = 12.sp,
-                                color = Color(0xFFb6b6b6)
+                                color = Color(0xFFb6b6b6),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                     }

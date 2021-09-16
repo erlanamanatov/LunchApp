@@ -11,7 +11,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.lunchapp.domain.data.BestDealsMock
+import com.example.lunchapp.domain.data.RestaurantsMock
 import com.example.lunchapp.ui.screens.mainscreen.components.BestDeals
+import com.example.lunchapp.ui.screens.mainscreen.components.PopularRestaurants
 import com.example.lunchapp.ui.screens.mainscreen.components.SearchComponent
 import com.example.lunchapp.ui.screens.mainscreen.components.TopBar
 import com.example.lunchapp.ui.theme.AppColors
@@ -43,9 +45,17 @@ fun MainScreen(modifier: Modifier = Modifier) {
             )
             Spacer(Modifier.height(24.dp))
             BestDeals(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth(),
                 foods = BestDealsMock.data
+            )
+            PopularRestaurants(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                restaurants = RestaurantsMock.data
             )
         }
     }
 }
+
