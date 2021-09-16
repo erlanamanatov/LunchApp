@@ -1,6 +1,7 @@
 package com.example.lunchapp.ui.screens.restaurant_screen.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -15,8 +16,12 @@ import com.example.lunchapp.domain.data.RestaurantMenuMock
 import com.example.lunchapp.model.Food
 import com.example.lunchapp.ui.theme.LunchAppTheme
 
+@ExperimentalMaterialApi
 @Composable
-fun MenuCategoryItem(item: MenuCategory, modifier: Modifier = Modifier) {
+fun MenuCategoryItem(
+    item: MenuCategory, modifier: Modifier = Modifier,
+    onItemClick: (Food) -> Unit
+) {
     Column(modifier = modifier) {
         Text(
             text = item.name,
@@ -25,12 +30,17 @@ fun MenuCategoryItem(item: MenuCategory, modifier: Modifier = Modifier) {
         )
         Spacer(Modifier.height(12.dp))
         for (food in item.foods) {
-            FoodMenuItem(modifier = Modifier.fillMaxWidth(), food = food)
+            FoodMenuItem(
+                modifier = Modifier.fillMaxWidth(),
+                food = food,
+                onClick = onItemClick
+            )
             Spacer(Modifier.height(8.dp))
         }
     }
 }
 
+@ExperimentalMaterialApi
 @Preview
 @Composable
 fun MenuCategoryItemPreview() {
@@ -38,7 +48,8 @@ fun MenuCategoryItemPreview() {
         androidx.compose.material.Surface(color = MaterialTheme.colors.background) {
             MenuCategoryItem(
                 item = RestaurantMenuMock.data.first(),
-                modifier = Modifier.padding(24.dp)
+                modifier = Modifier.padding(24.dp),
+                onItemClick = {}
             )
         }
     }

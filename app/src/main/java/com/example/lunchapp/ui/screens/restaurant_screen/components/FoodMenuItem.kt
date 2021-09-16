@@ -25,16 +25,19 @@ import com.example.lunchapp.model.Food
 import com.example.lunchapp.ui.theme.AppColors
 import com.example.lunchapp.ui.theme.LunchAppTheme
 
+@ExperimentalMaterialApi
 @Composable
 fun FoodMenuItem(
     modifier: Modifier = Modifier,
-    food: Food
+    food: Food,
+    onClick: (Food) -> Unit
 ) {
     Card(
         modifier = modifier,
         elevation = 4.dp,
         shape = RoundedCornerShape(8.dp),
-        backgroundColor = MaterialTheme.colors.surface
+        backgroundColor = MaterialTheme.colors.surface,
+        onClick = { onClick(food) }
     ) {
         Row(
             modifier = Modifier
@@ -80,38 +83,48 @@ fun FoodInfo(
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp
         )
-        Row(
-            modifier = Modifier.padding(top = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .clip(
-                        RoundedCornerShape(4.dp),
-                    )
-                    .background(color = Color.LightGray),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    modifier = Modifier.padding(4.dp),
-                    text = food.info, color = Color.DarkGray,
-                    fontSize = 10.sp
-                )
-            }
-            Spacer(Modifier.width(8.dp))
-            food.ingredientTag?.let {
-                Image(
-                    painter = painterResource(id = it.img), contentDescription = "",
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                )
-            }
-        }
+        FoodTags(food = food)
     }
 }
 
+@Composable
+fun FoodTags(
+    modifier: Modifier = Modifier,
+    food: Food
+) {
+    Row(
+        modifier = Modifier.padding(top = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .clip(
+                    RoundedCornerShape(4.dp),
+                )
+                .background(color = Color(0xffe7e7e7)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                modifier = Modifier.padding(4.dp),
+                text = food.info, color = Color.DarkGray,
+                fontSize = 10.sp
+            )
+        }
+        Spacer(Modifier.width(8.dp))
+        food.ingredientTag?.let {
+            Image(
+                painter = painterResource(id = it.img), contentDescription = "",
+                modifier = Modifier
+                    .size(24.dp)
+                    .clip(RoundedCornerShape(4.dp))
+            )
+        }
+    }
 
+}
+
+
+@ExperimentalMaterialApi
 @Preview
 @Composable
 fun FoodMenuItemPreview() {
@@ -119,7 +132,8 @@ fun FoodMenuItemPreview() {
         androidx.compose.material.Surface(color = AppColors.background) {
             FoodMenuItem(
                 modifier = Modifier.padding(24.dp),
-                food = RestaurantMenuMock.data.first().foods.first()
+                food = RestaurantMenuMock.data.first().foods.first(),
+                onClick = {}
             )
         }
     }
