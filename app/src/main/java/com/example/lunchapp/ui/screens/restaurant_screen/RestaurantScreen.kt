@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -37,10 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.lunchapp.domain.data.RestaurantMenuMock
 import com.example.lunchapp.model.Food
-import com.example.lunchapp.ui.screens.restaurant_screen.components.Basket
-import com.example.lunchapp.ui.screens.restaurant_screen.components.FoodExpanded
-import com.example.lunchapp.ui.screens.restaurant_screen.components.MenuCategoryItem
-import com.example.lunchapp.ui.screens.restaurant_screen.components.RestaurantTopBar
+import com.example.lunchapp.ui.screens.restaurant_screen.components.*
 import com.example.lunchapp.ui.theme.AppColors
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -51,10 +49,20 @@ import kotlinx.coroutines.launch
 fun RestaurantScreen(modifier: Modifier = Modifier) {
     val basketItems = remember { mutableStateListOf<Food>() }
     var expandedItem by remember { mutableStateOf<Food?>(null) }
+
+    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val scope = rememberCoroutineScope()
+
     BackHandler(
-        enabled = expandedItem != null
+        enabled = expandedItem != null || sheetState.isVisible
     ) {
-        expandedItem = null
+        if (expandedItem != null) {
+            expandedItem = null
+            return@BackHandler
+        }
+        scope.launch {
+            sheetState.hide()
+        }
     }
 
     var expandedRect by remember { mutableStateOf(Rect.Zero) }
@@ -91,85 +99,102 @@ fun RestaurantScreen(modifier: Modifier = Modifier) {
                 )
             }
             joinAll(j, j2, j3)
-            added = false
             expandedItem = null
             expandedOffsetX.snapTo(0f)
             expandedOffsetY.snapTo(0f)
             expandedScale.snapTo(1f)
+            added = false
         }
     }
 
-    Surface(color = AppColors.background, modifier = modifier) {
-        Box(modifier = Modifier.fillMaxSize()) {
 
-            expandedItem?.let {
-                Film(
+    ModalBottomSheetLayout(
+        sheetContent = {
+            SheetContent(
+                foodItems = basketItems.toList(),
+                onConfirmClick = {}
+            )
+        },
+        sheetState = sheetState,
+        sheetShape = RoundedCornerShape(topStartPercent = 10, topEndPercent = 10)
+    ) {
+        Surface(color = AppColors.background, modifier = modifier) {
+            Box(modifier = Modifier.fillMaxSize()) {
+
+                expandedItem?.let {
+                    Film(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .zIndex(5f)
+                            .alpha(expandedScale.value),
+                        onCloseClick = { expandedItem = null }
+                    )
+                    FoodExpanded(
+                        food = expandedItem!!,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .zIndex(6f)
+                            .wrapContentSize(align = Alignment.TopStart)
+                            .graphicsLayer(
+                                translationX = expandedOffsetX.value,
+                                translationY = expandedOffsetY.value,
+                                scaleX = expandedScale.value,
+                                scaleY = expandedScale.value
+                            ),
+                        onAddClick = {
+                            added = true
+                            basketItems.add(it)
+                        },
+                        onPositionedRect = { rect ->
+                            expandedRect = rect
+                        }
+                    )
+                }
+                Basket(
+                    modifier = Modifier
+                        .zIndex(1f)
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 36.dp, bottom = 36.dp)
+                        .onGloballyPositioned {
+                            basketRect = it.boundsInRoot()
+                        },
+                    itemsCount = basketItems.size,
+                    onClick = {
+                        scope.launch {
+                            sheetState.show()
+                        }
+                    }
+                )
+
+
+                Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .zIndex(5f)
-                        .alpha(expandedScale.value),
-                    onCloseClick = { expandedItem = null }
-                )
-                FoodExpanded(
-                    food = expandedItem!!,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .zIndex(6f)
-                        .wrapContentSize(align = Alignment.TopStart)
-                        .graphicsLayer(
-                            translationX = expandedOffsetX.value,
-                            translationY = expandedOffsetY.value,
-                            scaleX = expandedScale.value,
-                            scaleY = expandedScale.value
-                        ),
-                    onAddClick = {
-                        added = true
-                        basketItems.add(it)
-                    },
-                    onPositionedRect = { rect ->
-                        expandedRect = rect
-                    }
-                )
-            }
-            Basket(
-                modifier = Modifier
-                    .zIndex(1f)
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 36.dp, bottom = 36.dp)
-                    .onGloballyPositioned {
-                        basketRect = it.boundsInRoot()
-                    },
-                itemsCount = basketItems.size
-            )
-
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .zIndex(0f)
-            ) {
-                RestaurantTopBar(
-                    onBackClick = {},
-                    onProfileClick = {},
-                    title = "Gusto Ristorante"
-                )
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(16.dp)
+                        .zIndex(0f)
                 ) {
-                    itemsIndexed(RestaurantMenuMock.data) { index, item ->
-                        val itModifier = if (index == 0) Modifier else
-                            Modifier.padding(top = 16.dp)
-                        MenuCategoryItem(
-                            modifier = itModifier,
-                            item = item,
-                            onItemClick = {
-                                expandedItem = it
-                            }
-                        )
-                    }
-                    item {
-                        Spacer(Modifier.height(36.dp + 56.dp))
+                    RestaurantTopBar(
+                        onBackClick = {},
+                        onProfileClick = {},
+                        title = "Gusto Ristorante"
+                    )
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentPadding = PaddingValues(16.dp)
+                    ) {
+                        itemsIndexed(RestaurantMenuMock.data) { index, item ->
+                            val itModifier = if (index == 0) Modifier else
+                                Modifier.padding(top = 16.dp)
+                            MenuCategoryItem(
+                                modifier = itModifier,
+                                item = item,
+                                onItemClick = {
+                                    expandedItem = it
+                                }
+                            )
+                        }
+                        item {
+                            Spacer(Modifier.height(36.dp + 56.dp))
+                        }
                     }
                 }
             }

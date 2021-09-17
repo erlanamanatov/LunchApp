@@ -26,13 +26,12 @@ import com.example.lunchapp.ui.theme.LunchAppTheme
 @Composable
 fun Basket(
     modifier: Modifier,
-    itemsCount: Int
+    itemsCount: Int,
+    onClick: () -> Unit = {}
 ) {
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         FloatingActionButton(
-            onClick = {
-
-            }
+            onClick = onClick
         ) {
             Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = "")
         }
