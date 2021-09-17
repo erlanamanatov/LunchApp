@@ -10,11 +10,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.BorderColor
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.*
@@ -35,7 +34,7 @@ import com.example.lunchapp.ui.theme.AppColors
 import com.example.lunchapp.ui.theme.LunchAppTheme
 
 enum class ExpandedFoodState {
-    Initial, Expanded, Cancelled, Added
+    Initial, Expanded, Added
 }
 
 @Composable
@@ -43,24 +42,14 @@ fun FoodExpanded(
     modifier: Modifier = Modifier,
     food: Food,
     onAddClick: (Food) -> Unit = {},
-    onPositionedX: (Float) -> Unit = {},
-    onPositionedY: (Float) -> Unit = {},
-    onPositionedOffset: (Offset) -> Unit = {},
     onPositionedRect: (Rect) -> Unit = {}
 ) {
     val imageWidth = (LocalConfiguration.current.screenWidthDp.dp) * 0.6f
     val imageHeight = imageWidth * 0.6f
     var specialRequest by remember { mutableStateOf("") }
 
-//    var cState = remember { MutableTransitionState(ExpandedFoodState.Initial) }
-//    cState.targetState = ExpandedFoodState.Expanded
-//    val transition = updateTransition(cState, label = "")
     var cState by remember { mutableStateOf(ExpandedFoodState.Initial) }
     val transition = updateTransition(cState, label = "")
-
-//    val spec = tween(
-//        durationMillis = 600
-//    )
 
     LaunchedEffect(Unit) {
         cState = ExpandedFoodState.Expanded
@@ -256,10 +245,6 @@ fun FoodExpanded(
         modifier = modifier
             .onGloballyPositioned {
                 val boxPosOffset = it.positionInWindow()
-//                val localOffsets = it.windowToLocal(Offset(addXPosPx.toFloat(), addYPosPx.toFloat()))
-//                onPositionedOffset(it.localToWindow(Offset(0f, 0f)))
-//                onPositionedOffset(it.localToRoot(Offset(0f, 0f)))
-                onPositionedOffset(it.positionInRoot())
                 onPositionedRect(it.boundsInRoot())
                 locBoxOffsetX = addXPosPx - boxPosOffset.x
                 locBoxOffsetY = addYPosPx - boxPosOffset.y

@@ -1,6 +1,7 @@
 package com.example.lunchapp.ui.screens.restaurant_screen
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -9,12 +10,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +23,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.lunchapp.domain.data.RestaurantMenuMock
 import com.example.lunchapp.model.Food
+import com.example.lunchapp.ui.screens.restaurant_screen.components.Basket
 import com.example.lunchapp.ui.screens.restaurant_screen.components.FoodExpanded
 import com.example.lunchapp.ui.screens.restaurant_screen.components.MenuCategoryItem
 import com.example.lunchapp.ui.screens.restaurant_screen.components.RestaurantTopBar
@@ -41,9 +42,11 @@ import com.example.lunchapp.ui.theme.AppColors
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
+@ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
 fun RestaurantScreen(modifier: Modifier = Modifier) {
+    val basketItems = remember { mutableStateListOf<Food>() }
     var expandedItem by remember { mutableStateOf<Food?>(null) }
     BackHandler(
         enabled = expandedItem != null
@@ -51,15 +54,17 @@ fun RestaurantScreen(modifier: Modifier = Modifier) {
         expandedItem = null
     }
 
-    var expandedRect by remember { mutableStateOf(Rect(Offset(0f, 0f), Offset(0f, 0f))) }
+    var expandedRect by remember { mutableStateOf(Rect.Zero) }
     var added by remember { mutableStateOf(false) }
     val expandedOffsetX = remember { Animatable(0f) }
     val expandedOffsetY = remember { Animatable(0f) }
     val expandedScale = remember { Animatable(1f) }
-    val addXPos = LocalConfiguration.current.screenWidthDp.dp * 0.9f
-    val addYPos = LocalConfiguration.current.screenHeightDp.dp * 0.9f
-    val addXPosPx = with(LocalDensity.current) { addXPos.toPx() }
-    val addYPosPx = with(LocalDensity.current) { addYPos.toPx() }
+    val screenWidthDp = LocalConfiguration.current.screenWidthDp.dp
+    val screenHeightDP = LocalConfiguration.current.screenHeightDp.dp
+    val addXPosPx = with(LocalDensity.current) { (screenWidthDp - 36.dp - 28.dp).toPx() }
+    val addYPosPx = with(LocalDensity.current) { (screenHeightDP - 36.dp - 28.dp).toPx() }
+//    val addXPosPx = with(LocalDensity.current) {}
+//    val addYPosPx = with(LocalDensity.current) { addYPos.toPx() }
 
     LaunchedEffect(added) {
         if (added) {
@@ -84,11 +89,11 @@ fun RestaurantScreen(modifier: Modifier = Modifier) {
                 )
             }
             joinAll(j, j2, j3)
+            added = false
             expandedItem = null
             expandedOffsetX.snapTo(0f)
             expandedOffsetY.snapTo(0f)
             expandedScale.snapTo(1f)
-            added = false
         }
     }
 
@@ -98,7 +103,7 @@ fun RestaurantScreen(modifier: Modifier = Modifier) {
                 Film(
                     modifier = Modifier
                         .fillMaxSize()
-                        .zIndex(1f)
+                        .zIndex(5f)
                         .alpha(expandedScale.value),
                     onCloseClick = { expandedItem = null }
                 )
@@ -106,23 +111,31 @@ fun RestaurantScreen(modifier: Modifier = Modifier) {
                     food = expandedItem!!,
                     modifier = Modifier
                         .align(Alignment.Center)
-                        .zIndex(2f)
+                        .zIndex(6f)
                         .wrapContentSize(align = Alignment.TopStart)
                         .graphicsLayer(
                             translationX = expandedOffsetX.value,
                             translationY = expandedOffsetY.value,
                             scaleX = expandedScale.value,
-                            scaleY = expandedScale.value,
-
+                            scaleY = expandedScale.value
                         ),
                     onAddClick = {
                         added = true
+                        basketItems.add(it)
                     },
                     onPositionedRect = { rect ->
                         expandedRect = rect
                     }
                 )
             }
+            Basket(
+                modifier = Modifier
+                    .zIndex(1f)
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 36.dp, bottom = 36.dp),
+                itemsCount = basketItems.size
+            )
+
 
             Column(
                 modifier = Modifier
@@ -149,11 +162,15 @@ fun RestaurantScreen(modifier: Modifier = Modifier) {
                             }
                         )
                     }
+                    item {
+                        Spacer(Modifier.height(36.dp + 56.dp))
+                    }
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun Film(modifier: Modifier, onCloseClick: () -> Unit) {
