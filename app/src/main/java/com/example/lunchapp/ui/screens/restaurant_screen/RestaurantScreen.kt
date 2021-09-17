@@ -4,7 +4,9 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Column
@@ -23,6 +25,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -55,30 +58,29 @@ fun RestaurantScreen(modifier: Modifier = Modifier) {
     }
 
     var expandedRect by remember { mutableStateOf(Rect.Zero) }
+    var basketRect by remember { mutableStateOf(Rect.Zero) }
+
     var added by remember { mutableStateOf(false) }
     val expandedOffsetX = remember { Animatable(0f) }
     val expandedOffsetY = remember { Animatable(0f) }
     val expandedScale = remember { Animatable(1f) }
-    val screenWidthDp = LocalConfiguration.current.screenWidthDp.dp
-    val screenHeightDP = LocalConfiguration.current.screenHeightDp.dp
-    val addXPosPx = with(LocalDensity.current) { (screenWidthDp - 36.dp - 28.dp).toPx() }
-    val addYPosPx = with(LocalDensity.current) { (screenHeightDP - 36.dp - 28.dp).toPx() }
-//    val addXPosPx = with(LocalDensity.current) {}
-//    val addYPosPx = with(LocalDensity.current) { addYPos.toPx() }
+    val centerFab = remember(basketRect) {
+        basketRect.center
+    }
 
     LaunchedEffect(added) {
         if (added) {
             val animSpec = tween<Float>(durationMillis = 600)
             val j = launch {
                 expandedOffsetX.animateTo(
-                    addXPosPx - expandedRect.topLeft.x - expandedRect.width / 2f,
+                    centerFab.x - expandedRect.topLeft.x - expandedRect.width / 2f,
                     animationSpec = animSpec
                 )
             }
             val j2 =
                 launch {
                     expandedOffsetY.animateTo(
-                        addYPosPx - expandedRect.topLeft.y - expandedRect.height / 2f,
+                        centerFab.y - expandedRect.topLeft.y - expandedRect.height / 2f,
                         animationSpec = animSpec
                     )
                 }
@@ -97,8 +99,9 @@ fun RestaurantScreen(modifier: Modifier = Modifier) {
         }
     }
 
-    Surface(color = AppColors.background) {
-        Box(modifier = modifier) {
+    Surface(color = AppColors.background, modifier = modifier) {
+        Box(modifier = Modifier.fillMaxSize()) {
+
             expandedItem?.let {
                 Film(
                     modifier = Modifier
@@ -132,7 +135,10 @@ fun RestaurantScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .zIndex(1f)
                     .align(Alignment.BottomEnd)
-                    .padding(end = 36.dp, bottom = 36.dp),
+                    .padding(end = 36.dp, bottom = 36.dp)
+                    .onGloballyPositioned {
+                        basketRect = it.boundsInRoot()
+                    },
                 itemsCount = basketItems.size
             )
 
