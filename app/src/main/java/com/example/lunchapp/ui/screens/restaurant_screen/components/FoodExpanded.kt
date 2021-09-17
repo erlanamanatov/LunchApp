@@ -15,10 +15,9 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.layout.*
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -43,9 +42,12 @@ enum class ExpandedFoodState {
 fun FoodExpanded(
     modifier: Modifier = Modifier,
     food: Food,
-    onAddClick: (Food) -> Unit,
-
-    ) {
+    onAddClick: (Food) -> Unit = {},
+    onPositionedX: (Float) -> Unit = {},
+    onPositionedY: (Float) -> Unit = {},
+    onPositionedOffset: (Offset) -> Unit = {},
+    onPositionedRect: (Rect) -> Unit = {}
+) {
     val imageWidth = (LocalConfiguration.current.screenWidthDp.dp) * 0.6f
     val imageHeight = imageWidth * 0.6f
     var specialRequest by remember { mutableStateOf("") }
@@ -255,6 +257,10 @@ fun FoodExpanded(
             .onGloballyPositioned {
                 val boxPosOffset = it.positionInWindow()
 //                val localOffsets = it.windowToLocal(Offset(addXPosPx.toFloat(), addYPosPx.toFloat()))
+//                onPositionedOffset(it.localToWindow(Offset(0f, 0f)))
+//                onPositionedOffset(it.localToRoot(Offset(0f, 0f)))
+                onPositionedOffset(it.positionInRoot())
+                onPositionedRect(it.boundsInRoot())
                 locBoxOffsetX = addXPosPx - boxPosOffset.x
                 locBoxOffsetY = addYPosPx - boxPosOffset.y
             }
@@ -379,8 +385,8 @@ fun FoodExpanded(
                             defaultElevation = 4.dp
                         ),
                         onClick = {
-//                            onAddClick(food)
-                            cState = ExpandedFoodState.Added
+                            onAddClick(food)
+//                            cState = ExpandedFoodState.Added
                         }
                     ) {
                         Box(Modifier.fillMaxWidth()) {
