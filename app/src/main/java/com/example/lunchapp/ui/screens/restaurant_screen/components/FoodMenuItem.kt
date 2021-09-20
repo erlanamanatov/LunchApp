@@ -1,5 +1,7 @@
 package com.example.lunchapp.ui.screens.restaurant_screen.components
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,7 +12,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,14 +34,16 @@ import com.example.lunchapp.ui.theme.LunchAppTheme
 fun FoodMenuItem(
     modifier: Modifier = Modifier,
     food: Food,
-    onClick: (Food) -> Unit
+    onItemClick: (Food) -> Unit,
+    inBasket: Boolean = false,
+    onAddClick: (Food) -> Unit = {}
 ) {
     Card(
         modifier = modifier,
         elevation = 4.dp,
         shape = RoundedCornerShape(8.dp),
         backgroundColor = MaterialTheme.colors.surface,
-        onClick = { onClick(food) }
+        onClick = { onItemClick(food) }
     ) {
         Row(
             modifier = Modifier
@@ -55,17 +61,59 @@ fun FoodMenuItem(
                 color = Color(0xFFacacac)
             )
             Spacer(Modifier.width(16.dp))
-            Icon(
+            Box(
                 modifier = Modifier
-                    .border(
-                        width = 2.dp,
-                        color = Color(0xFFe2e2e2),
-                        shape = CircleShape
-                    )
-                    .padding(4.dp),
-                imageVector = Icons.Default.Add, contentDescription = "",
-                tint = MaterialTheme.colors.secondary
-            )
+            ) {
+                val imageVector = if (inBasket) Icons.Default.Done
+                else Icons.Default.Add
+                val tintColor by animateColorAsState(
+                    targetValue = if (inBasket) MaterialTheme.colors.surface
+                    else MaterialTheme.colors.secondary
+                )
+                val bgColor by animateColorAsState(
+                    targetValue = if (inBasket) MaterialTheme.colors.secondary
+                    else Color.Transparent
+                )
+
+                val clickableModifier = if (inBasket) {
+                    Modifier
+                } else {
+                    Modifier.clickable { onAddClick(food) }
+                }
+
+                val borderModifier = if (inBasket) {
+                    Modifier
+                } else {
+                    Modifier
+                        .border(
+                            width = 2.dp,
+                            color = Color(0xFFe2e2e2),
+                            shape = CircleShape
+                        )
+                }
+
+
+
+
+                Icon(
+                    modifier = Modifier
+                        .clip(
+                            shape = CircleShape
+                        )
+                        .then(clickableModifier)
+                        .then(borderModifier)
+                        .background(color = bgColor)
+//                        .clickable {
+//                            onAddClick(food)
+//                        }
+                        .padding(4.dp),
+//                    imageVector = Icons.Default.Add, contentDescription = "",
+                    imageVector = imageVector,
+                    contentDescription = "",
+                    tint = tintColor,
+
+                )
+            }
             Spacer(Modifier.width(4.dp))
         }
     }
@@ -133,7 +181,7 @@ fun FoodMenuItemPreview() {
             FoodMenuItem(
                 modifier = Modifier.padding(24.dp),
                 food = RestaurantMenuMock.data.first().foods.first(),
-                onClick = {}
+                onItemClick = {}
             )
         }
     }

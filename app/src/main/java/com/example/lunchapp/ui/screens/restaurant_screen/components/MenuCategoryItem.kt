@@ -3,7 +3,6 @@ package com.example.lunchapp.ui.screens.restaurant_screen.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -20,7 +19,9 @@ import com.example.lunchapp.ui.theme.LunchAppTheme
 @Composable
 fun MenuCategoryItem(
     item: MenuCategory, modifier: Modifier = Modifier,
-    onItemClick: (Food) -> Unit
+    onItemClick: (Food) -> Unit,
+    onAddToBasketClick: (Food) -> Unit,
+    basket: List<Food>  = emptyList()
 ) {
     Column(modifier = modifier) {
         Text(
@@ -33,7 +34,9 @@ fun MenuCategoryItem(
             FoodMenuItem(
                 modifier = Modifier.fillMaxWidth(),
                 food = food,
-                onClick = onItemClick
+                onItemClick = onItemClick,
+                onAddClick = onAddToBasketClick,
+                inBasket = basket.contains(food)
             )
             Spacer(Modifier.height(8.dp))
         }
@@ -49,7 +52,8 @@ fun MenuCategoryItemPreview() {
             MenuCategoryItem(
                 item = RestaurantMenuMock.data.first(),
                 modifier = Modifier.padding(24.dp),
-                onItemClick = {}
+                onItemClick = {},
+                onAddToBasketClick = {}
             )
         }
     }

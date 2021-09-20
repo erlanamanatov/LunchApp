@@ -174,7 +174,11 @@ fun RestaurantScreen(modifier: Modifier = Modifier) {
                                 item = item,
                                 onItemClick = {
                                     expandedItem = it
-                                }
+                                },
+                                onAddToBasketClick = {
+                                    basketItems.add(it)
+                                },
+                                basket = basketItems.toList()
                             )
                         }
                         item {
