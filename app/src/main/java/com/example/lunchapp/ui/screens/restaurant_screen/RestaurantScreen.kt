@@ -4,37 +4,20 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.lunchapp.domain.data.RestaurantMenuMock
 import com.example.lunchapp.model.Food
@@ -122,13 +105,15 @@ fun RestaurantScreen(modifier: Modifier = Modifier) {
             Box(modifier = Modifier.fillMaxSize()) {
 
                 expandedItem?.let {
-                    Film(
+                    Scrim(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .zIndex(5f)
-                            .alpha(expandedScale.value),
-                        onCloseClick = { expandedItem = null }
-                    )
+                            .zIndex(5f),
+                        onClose = { expandedItem = null },
+                        open = true,
+                        alpha = expandedScale.value
+                    ) {
+                        ScrimContent(Modifier.matchParentSize())
+                    }
                     FoodExpanded(
                         food = expandedItem!!,
                         modifier = Modifier
@@ -203,47 +188,4 @@ fun RestaurantScreen(modifier: Modifier = Modifier) {
 }
 
 
-@Composable
-fun Film(modifier: Modifier, onCloseClick: () -> Unit) {
-    val alpha = remember { androidx.compose.animation.core.Animatable(0f) }
-    Box(
-        modifier = modifier
-            .alpha(alpha.value)
-            .background(color = Color.Black)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.TopCenter)
-                .padding(start = 8.dp, top = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            val color = Color(0xFFeeeeee)
-            Icon(
-                imageVector = Icons.Default.Close, contentDescription = "",
-                tint = color,
-                modifier = Modifier.clickable {
-                    onCloseClick()
-                }
-            )
-            Text(
-                modifier = Modifier.weight(1f),
-                text = "Gusto Ristorante",
-                color = color,
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        alpha.animateTo(
-            targetValue = 0.9f,
-            animationSpec = tween(
-                durationMillis = 200
-            )
-        )
-    }
-}
 
