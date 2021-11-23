@@ -1,15 +1,23 @@
 package com.example.lunchapp.ui.screens.restaurant_screen.components
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.DismissDirection.EndToStart
+import androidx.compose.material.DismissDirection.StartToEnd
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -27,23 +35,18 @@ import com.example.lunchapp.model.Food
 import com.example.lunchapp.ui.theme.AppColors
 import com.example.lunchapp.ui.theme.LunchAppTheme
 
+@ExperimentalAnimationApi
+@ExperimentalMaterialApi
 @Composable
 fun ColumnScope.BasketContent(
-//    foodItems: List<Food>,
-        foodItems: SnapshotStateList<Food>,
+        foodItems: List<Food>,
+        onItemRemove: (Food) -> Unit,
         onConfirmClick: () -> Unit
 ) {
     BasketHeader()
     Divider(Modifier.fillMaxWidth())
-    Column {
-        for (food in foodItems) {
-            FoodSheetItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    food = food
-            )
-            Divider(Modifier.fillMaxWidth())
-        }
-    }
+    FoodItems(foodItems = foodItems,
+            onItemDelete = onItemRemove)
     BasketTotalAmount(
             totalAmount = foodItems
                     .map { it.price }
@@ -53,6 +56,81 @@ fun ColumnScope.BasketContent(
     ConfirmOrderButton(
             onClick = onConfirmClick
     )
+}
+
+@ExperimentalAnimationApi
+@ExperimentalMaterialApi
+@Composable
+private fun FoodItems(
+        modifier: Modifier = Modifier,
+        foodItems: List<Food>,
+        onItemDelete: (Food) -> Unit
+) {
+    Column(modifier = modifier) {
+        for (food in foodItems) {
+            key(food.name, food.info) {
+                val visibleState = remember {
+                    MutableTransitionState(true)
+                }
+                val dismissState = rememberDismissState {
+                    if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart)
+                        visibleState.targetState = false
+                    it != DismissValue.Default
+                }
+
+                AnimatedVisibility(visibleState = visibleState,
+                        exit = fadeOut() + shrinkVertically()
+                ) {
+                    SwipeToDismiss(
+                            state = dismissState,
+                            directions = setOf(StartToEnd, EndToStart),
+                            dismissThresholds = { FractionalThreshold(0.3f) },
+                            background = {
+                                val direction = dismissState.dismissDirection
+                                        ?: return@SwipeToDismiss
+                                val color by animateColorAsState(
+                                        when (dismissState.targetValue) {
+                                            DismissValue.Default -> Color.LightGray
+                                            else -> Color.Red
+                                        }
+                                )
+                                val alignment = when (direction) {
+                                    StartToEnd -> Alignment.CenterStart
+                                    EndToStart -> Alignment.CenterEnd
+                                }
+                                val icon = Icons.Default.Delete
+                                val scale by animateFloatAsState(
+                                        if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f
+                                )
+                                Box(
+                                        Modifier
+                                                .fillMaxSize()
+                                                .background(color)
+                                                .padding(horizontal = 20.dp),
+                                        contentAlignment = alignment
+                                ) {
+                                    Icon(
+                                            icon,
+                                            contentDescription = "Localized description",
+                                            modifier = Modifier.scale(scale)
+                                    )
+                                }
+                            },
+                            dismissContent = {
+                                FoodSheetItem(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        food = food
+                                )
+                            }
+                    )
+                }
+                Divider(Modifier.fillMaxWidth())
+                if (visibleState.isIdle && !visibleState.targetState) {
+                    onItemDelete(food)
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -180,7 +258,9 @@ fun FoodSheetItem(
         food: Food
 ) {
     Row(
-            modifier = modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            modifier = modifier
+                    .background(color = AppColors.background)
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
     ) {
@@ -206,19 +286,6 @@ fun FoodSheetItem(
     }
 }
 
-//@Composable
-//private fun SheetTotalAmount() {
-//
-//}
-//
-//@Preview
-//@Composable
-//private fun SheetTotalAmountPreview() {
-//    LunchAppTheme {
-//        Surface(color = AppColors.background) {
-//        }
-//    }
-//}
 
 @Preview
 @Composable
