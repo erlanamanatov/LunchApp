@@ -93,8 +93,9 @@ fun RestaurantScreen(modifier: Modifier = Modifier) {
 
     ModalBottomSheetLayout(
         sheetContent = {
-            SheetContent(
-                foodItems = basketItems.toList(),
+            BasketContent(
+//                foodItems = basketItems.toList(),
+                    foodItems = basketItems,
                 onConfirmClick = {}
             )
         },
