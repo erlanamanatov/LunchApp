@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.lunchapp.domain.data.BestDealsMock
 import com.example.lunchapp.domain.data.RestaurantsMock
+import com.example.lunchapp.model.Restaurant
 import com.example.lunchapp.ui.screens.mainscreen.components.BestDeals
 import com.example.lunchapp.ui.screens.mainscreen.components.PopularRestaurants
 import com.example.lunchapp.ui.screens.mainscreen.components.SearchComponent
@@ -20,7 +21,10 @@ import com.example.lunchapp.ui.theme.AppColors
 
 @ExperimentalMaterialApi
 @Composable
-fun MainScreen(modifier: Modifier = Modifier) {
+fun MainScreen(
+    modifier: Modifier = Modifier,
+    onNavigate: (Restaurant) -> Unit
+) {
 
     var textToSearch by remember { mutableStateOf("") }
 
@@ -53,7 +57,8 @@ fun MainScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(24.dp),
-                restaurants = RestaurantsMock.data
+                restaurants = RestaurantsMock.data,
+                onRestaurantClick = onNavigate
             )
         }
     }

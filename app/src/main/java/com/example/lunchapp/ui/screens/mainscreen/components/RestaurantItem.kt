@@ -24,16 +24,19 @@ import com.example.lunchapp.domain.data.RestaurantsMock
 import com.example.lunchapp.model.Restaurant
 import com.example.lunchapp.ui.theme.LunchAppTheme
 
+@ExperimentalMaterialApi
 @Composable
 fun RestaurantItem(
     modifier: Modifier = Modifier,
-    item: Restaurant
+    item: Restaurant,
+    onClick: (Restaurant) -> Unit = {}
 ) {
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(4.dp),
         backgroundColor = MaterialTheme.colors.surface,
-        elevation = 4.dp
+        elevation = 4.dp,
+        onClick = { onClick(item) }
     ) {
         Row(
             modifier = Modifier.padding(8.dp),
@@ -43,7 +46,6 @@ fun RestaurantItem(
                 painterResource(id = item.logo),
                 modifier = Modifier
                     .size(80.dp, 60.dp),
-//                    .border(1.dp, color = Color.Black),
                 contentScale = ContentScale.Inside,
                 contentDescription = ""
             )
@@ -95,6 +97,7 @@ private fun RestaurantInfo(
     }
 }
 
+@ExperimentalMaterialApi
 @Preview
 @Composable
 fun RestItemPreview() {

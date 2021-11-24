@@ -3,6 +3,7 @@ package com.example.lunchapp.ui.screens.mainscreen.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -10,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -19,16 +19,24 @@ import com.example.lunchapp.model.Restaurant
 import com.example.lunchapp.ui.theme.LunchAppTheme
 import java.util.*
 
+@ExperimentalMaterialApi
 @Composable
 fun PopularRestaurants(
     modifier: Modifier,
-    restaurants: List<Restaurant>
+    restaurants: List<Restaurant>,
+    onRestaurantClick: (Restaurant) -> Unit = {}
 ) {
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
         Header()
         Spacer(Modifier.height(16.dp))
         for (item in restaurants) {
-            RestaurantItem(item = item, modifier = Modifier.fillMaxWidth())
+            RestaurantItem(
+                item = item,
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    onRestaurantClick(it)
+                }
+            )
             Spacer(Modifier.height(8.dp))
         }
     }
@@ -55,6 +63,7 @@ private fun Header() {
     }
 }
 
+@ExperimentalMaterialApi
 @Preview
 @Composable
 fun PopularRestaurantsPreview() {

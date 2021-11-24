@@ -31,7 +31,10 @@ import kotlinx.coroutines.launch
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
-fun RestaurantScreen(modifier: Modifier = Modifier) {
+fun RestaurantScreen(
+    modifier: Modifier = Modifier,
+    onBackArrowClick: () -> Unit
+) {
     val basketItems = remember { mutableStateListOf<Food>() }
     var expandedItem by remember { mutableStateOf<Food?>(null) }
 
@@ -39,7 +42,7 @@ fun RestaurantScreen(modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
 
     BackHandler(
-            enabled = expandedItem != null || sheetState.isVisible
+        enabled = expandedItem != null || sheetState.isVisible
     ) {
         if (expandedItem != null) {
             expandedItem = null
@@ -66,21 +69,21 @@ fun RestaurantScreen(modifier: Modifier = Modifier) {
             val animSpec = tween<Float>(durationMillis = 600)
             val j = launch {
                 expandedOffsetX.animateTo(
-                        centerFab.x - expandedRect.topLeft.x - expandedRect.width / 2f,
-                        animationSpec = animSpec
+                    centerFab.x - expandedRect.topLeft.x - expandedRect.width / 2f,
+                    animationSpec = animSpec
                 )
             }
             val j2 =
-                    launch {
-                        expandedOffsetY.animateTo(
-                                centerFab.y - expandedRect.topLeft.y - expandedRect.height / 2f,
-                                animationSpec = animSpec
-                        )
-                    }
+                launch {
+                    expandedOffsetY.animateTo(
+                        centerFab.y - expandedRect.topLeft.y - expandedRect.height / 2f,
+                        animationSpec = animSpec
+                    )
+                }
             val j3 = launch {
                 expandedScale.animateTo(
-                        0f,
-                        animationSpec = animSpec
+                    0f,
+                    animationSpec = animSpec
                 )
             }
             joinAll(j, j2, j3)
@@ -94,94 +97,93 @@ fun RestaurantScreen(modifier: Modifier = Modifier) {
 
 
     ModalBottomSheetLayout(
-            sheetContent = {
-                BasketContent(
-                        foodItems = basketItems.toList(),
-                        onItemRemove = { basketItems.remove(it) },
-                        onConfirmClick = {}
-                )
-            },
-            sheetState = sheetState,
-            sheetShape = RoundedCornerShape(topStartPercent = 10, topEndPercent = 10)
+        sheetContent = {
+            BasketContent(
+                foodItems = basketItems.toList(),
+                onItemRemove = { basketItems.remove(it) },
+                onConfirmClick = {}
+            )
+        },
+        sheetState = sheetState,
+        sheetShape = RoundedCornerShape(topStartPercent = 10, topEndPercent = 10)
     ) {
         Surface(color = AppColors.background, modifier = modifier) {
             Box(modifier = Modifier.fillMaxSize()) {
-
                 expandedItem?.let {
                     Scrim(
-                            modifier = Modifier
-                                    .zIndex(5f),
-                            onClose = { expandedItem = null },
-                            open = true,
-                            alpha = expandedScale.value
+                        modifier = Modifier
+                            .zIndex(5f),
+                        onClose = { expandedItem = null },
+                        open = true,
+                        alpha = expandedScale.value
                     ) {
                         ScrimContent(Modifier.matchParentSize())
                     }
                     FoodExpanded(
-                            food = expandedItem!!,
-                            modifier = Modifier
-                                    .align(Alignment.Center)
-                                    .zIndex(6f)
-                                    .wrapContentSize(align = Alignment.TopStart)
-                                    .graphicsLayer(
-                                            translationX = expandedOffsetX.value,
-                                            translationY = expandedOffsetY.value,
-                                            scaleX = expandedScale.value,
-                                            scaleY = expandedScale.value
-                                    ),
-                            onAddClick = {
-                                added = true
-                                basketItems.add(it)
-                            },
-                            onPositionedRect = { rect ->
-                                expandedRect = rect
-                            }
+                        food = expandedItem!!,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .zIndex(6f)
+                            .wrapContentSize(align = Alignment.TopStart)
+                            .graphicsLayer(
+                                translationX = expandedOffsetX.value,
+                                translationY = expandedOffsetY.value,
+                                scaleX = expandedScale.value,
+                                scaleY = expandedScale.value
+                            ),
+                        onAddClick = {
+                            added = true
+                            basketItems.add(it)
+                        },
+                        onPositionedRect = { rect ->
+                            expandedRect = rect
+                        }
                     )
                 }
                 Basket(
-                        modifier = Modifier
-                                .zIndex(1f)
-                                .align(Alignment.BottomEnd)
-                                .padding(end = 36.dp, bottom = 36.dp)
-                                .onGloballyPositioned {
-                                    basketRect = it.boundsInRoot()
-                                },
-                        itemsCount = basketItems.size,
-                        onClick = {
-                            scope.launch {
-                                sheetState.show()
-                            }
+                    modifier = Modifier
+                        .zIndex(1f)
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 36.dp, bottom = 36.dp)
+                        .onGloballyPositioned {
+                            basketRect = it.boundsInRoot()
+                        },
+                    itemsCount = basketItems.size,
+                    onClick = {
+                        scope.launch {
+                            sheetState.show()
                         }
+                    }
                 )
 
 
                 Column(
-                        modifier = Modifier
-                                .fillMaxSize()
-                                .zIndex(0f)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .zIndex(0f)
                 ) {
                     RestaurantTopBar(
-                            onBackClick = {},
-                            onProfileClick = {},
-                            title = "Gusto Ristorante"
+                        onBackClick = onBackArrowClick,
+                        onProfileClick = {},
+                        title = "Gusto Ristorante"
                     )
                     LazyColumn(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentPadding = PaddingValues(16.dp)
+                        modifier = Modifier.fillMaxWidth(),
+                        contentPadding = PaddingValues(16.dp)
                     ) {
                         itemsIndexed(RestaurantMenuMock.data) { index, item ->
                             val itModifier = if (index == 0) Modifier else
                                 Modifier.padding(top = 16.dp)
                             MenuCategoryItem(
-                                    modifier = itModifier,
-                                    item = item,
-                                    onItemClick = {
-                                        expandedItem = it
-                                    },
-                                    onAddToBasketClick = {
-                                        basketItems.add(it)
-                                    },
-                                    basket = basketItems.toList()
+                                modifier = itModifier,
+                                item = item,
+                                onItemClick = {
+                                    expandedItem = it
+                                },
+                                onAddToBasketClick = {
+                                    basketItems.add(it)
+                                },
+                                basket = basketItems.toList()
                             )
                         }
                         item {
