@@ -102,3 +102,4 @@ lint/tmp/
 # lint/reports/
 /.idea/inspectionProfiles/Project_Default.xml
 /.idea/render.experimental.xml
+/.idea/codeStyles/Project.xml

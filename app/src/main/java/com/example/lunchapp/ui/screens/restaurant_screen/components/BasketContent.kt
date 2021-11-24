@@ -1,6 +1,7 @@
 package com.example.lunchapp.ui.screens.restaurant_screen.components
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.ExperimentalTransitionApi
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -35,6 +36,7 @@ import com.example.lunchapp.model.Food
 import com.example.lunchapp.ui.theme.AppColors
 import com.example.lunchapp.ui.theme.LunchAppTheme
 
+@ExperimentalTransitionApi
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
@@ -58,6 +60,7 @@ fun ColumnScope.BasketContent(
     )
 }
 
+@ExperimentalTransitionApi
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable

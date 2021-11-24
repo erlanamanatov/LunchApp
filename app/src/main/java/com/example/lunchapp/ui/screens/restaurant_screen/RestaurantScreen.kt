@@ -3,6 +3,7 @@ package com.example.lunchapp.ui.screens.restaurant_screen
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.ExperimentalTransitionApi
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Column
@@ -26,6 +27,7 @@ import com.example.lunchapp.ui.theme.AppColors
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
+@ExperimentalTransitionApi
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable

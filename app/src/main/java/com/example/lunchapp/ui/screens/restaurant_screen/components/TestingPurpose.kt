@@ -28,6 +28,7 @@ import com.example.lunchapp.ui.theme.LunchAppTheme
 
 data class Item(val id: Int, val text: String)
 
+@ExperimentalTransitionApi
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
@@ -141,6 +142,7 @@ fun SwipeT() {
     }
 }
 
+@ExperimentalTransitionApi
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Preview
